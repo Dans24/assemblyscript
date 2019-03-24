@@ -132,6 +132,17 @@ export class Map<K,V> {
     ) this.rehash(halfBucketsMask);
     return true;
   }
+                             
+  forEach(callbackfn: (value: V, key: K, map: Map<K,V>) => void): void {
+    for (let index = 0, length = this.entriesCount, offset = 0; index < min(length, this.entriesCount); ++offset) {
+      let key = LOAD<K>(this.entries, offset);
+      let entry = this.find(key, HASH<K>(key));
+      if(!entry) continue;
+      ++index;
+      let value = entry.value;
+      callbackfn(key, entry, this);   
+    }
+  }
 
   private rehash(newBucketsMask: u32): void {
     var newBucketsCapacity = <i32>(newBucketsMask + 1);
